@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -38,25 +36,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => _isLoading = true);
 
-    try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-
-      // Firestore-il user doc update cheyyu
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'uid': uid,
-        'displayName': name,
-        'email': email,
-        'phoneNumber': '+91${widget.phoneNumber}',
-        'photoURL': '',
-        'createdAt': Timestamp.now(),
-      });
-
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
-    }
+    // Firebase authentication removed - implement alternative user storage
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Firebase authentication has been removed")),
+    );
 
     setState(() => _isLoading = false);
   }

@@ -28,11 +28,19 @@ class Songcard extends StatelessWidget {
             // song cover
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
+              child: Image.network(
                 image,
                 height: 150,
                 width: 150,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Container(
+                    height: 150,
+                    width: 150,
+                    color: Colors.grey.shade800,
+                    child: const Icon(Icons.music_note, color: Colors.white),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 10),

@@ -9,11 +9,11 @@ import 'widgets/artists_screen.dart';
 import 'widgets/albums_screen.dart';
 import 'widgets/folders_screen.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final TabBarController controller = Get.put(TabBarController());
-
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.black,
@@ -45,12 +45,12 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: TabBarView(
               controller: controller.tabController,
-              children: const [
+              children: [
                 SuggestedScreen(),
-                SongsScreen(),
-                ArtistsScreen(),
-                AlbumsScreen(),
-                FoldersScreen(),
+                const SongsScreen(),
+                const ArtistsScreen(),
+                const AlbumsScreen(),
+                const FoldersScreen(),
               ],
             ),
           ),
