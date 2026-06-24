@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/auth/controller/auth_controller.dart';
@@ -62,41 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void initState() {
     super.initState();
-    _checkIfLoggedIn();
-  }
-
-  void _checkIfLoggedIn() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      // User already logged in — Firestore check cheyyu
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      if (!mounted) return;
-
-      if (userDoc.exists) {
-        final displayName = userDoc.data()?['displayName'] ?? '';
-
-        if (displayName.isEmpty) {
-          // Profile incomplete — SignUp-ilekku
-          Navigator.pushReplacementNamed(context, '/signup');
-        } else {
-          // Profile complete — Home-ilekku
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      } else {
-        // Firestore doc illa — SignUp-ilekku
-        Navigator.pushReplacementNamed(
-          context,
-          '/signup',
-          arguments: user.phoneNumber?.replaceAll('+91', '') ?? '',
-        );
-      }
-    }
-    // User null aanenkil — login screen thanne kaanikkum
+    // Firebase authentication removed - no auto-login check
   }
 
   Widget build(BuildContext context) {

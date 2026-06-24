@@ -15,9 +15,9 @@ class BottomNavScreen extends StatelessWidget {
 
   final List<Widget> pages = [
     HomeScreen(),
-    const FavoriteScreen(),
-    const PlaylistScreen(),
-    const SettingsScreen(),
+    FavoriteScreen(),
+    PlaylistScreen(),
+    SettingsScreen(),
   ];
   Widget build(BuildContext context) {
     return Obx(
