@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:my_musics/app/services/auth_service.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/auth/controller/auth_controller.dart';
 import 'package:my_musics/src/modules/dashboard/view/button_navigationbar.dart';
@@ -24,7 +25,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  final AuthController _authController = AuthController();
+  final AuthController _authController = AuthController.to;
   bool _isLoading = false;
   int _resendSeconds = 30;
 
@@ -69,6 +70,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     });
 
     if (user != null) {
+      // Update login state in AuthService
+      AuthService.to.login();
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Login Successful")));
@@ -97,30 +101,39 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.white),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.white,
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 100),
-
+              const SizedBox(height: 40),
               const Text(
                 "Verify code",
                 style: TextStyle(
                   color: AppColors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
                 ),
               ),
-
-              const SizedBox(height: 12),
-
+              const SizedBox(height: 8),
               Text(
                 "Code sent to +91 ${widget.phoneNumber}",
                 style: const TextStyle(
@@ -128,10 +141,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   fontSize: 15,
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // 6 OTP boxes
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(6, (index) {
@@ -155,15 +165,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         filled: true,
                         fillColor: AppColors.card,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.border.withOpacity(0.5),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.border.withOpacity(0.5),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
                             color: AppColors.primary,
                             width: 1.5,
@@ -172,10 +186,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ),
                       onChanged: (value) {
                         if (value.isNotEmpty && index < 5) {
-                          // Adutha box-ilekku auto jump
                           _focusNodes[index + 1].requestFocus();
                         } else if (value.isEmpty && index > 0) {
-                          // Backspace — munpe box-ilekku
                           _focusNodes[index - 1].requestFocus();
                         }
                       },
@@ -183,56 +195,98 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   );
                 }),
               ),
-
               const SizedBox(height: 24),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Resend code in ",
+                      style: TextStyle(color: AppColors.textHint, fontSize: 14),
+                    ),
+                    _resendSeconds > 0
+                        ? ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: AppColors.primaryGradient,
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ).createShader(bounds),
+                            child: Text(
+                              "${_resendSeconds}s",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () async {
+                              setState(() => _resendSeconds = 30);
+                              _startResendTimer();
 
-              // Resend timer
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Resend code in ",
-                    style: TextStyle(color: AppColors.textHint, fontSize: 14),
-                  ),
-                  _resendSeconds > 0
-                      ? Text(
-                          "${_resendSeconds}s",
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            setState(() => _resendSeconds = 30);
-                            _startResendTimer();
-                            // Resend OTP logic here
-                          },
-                          child: const Text(
-                            "Resend",
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              // Resend OTP
+                              await _authController.sendOTP(
+                                phoneNumber: "+91${widget.phoneNumber}",
+                                onCodeSent: (verificationId) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("OTP resent successfully"),
+                                    ),
+                                  );
+                                },
+                                onError: (error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error)),
+                                  );
+                                },
+                              );
+                            },
+                            child: ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: AppColors.primaryGradient,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ).createShader(bounds),
+                              child: const Text(
+                                "Resend",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                ],
+                  ],
+                ),
               ),
-              SizedBox(height: 40),
-
-              // Verify button
-              SizedBox(
+              const SizedBox(height: 40),
+              Container(
                 width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: AppColors.primaryGradient,
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.3),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _verifyOTP,
-
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: _isLoading
@@ -240,22 +294,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: AppColors.black,
+                            color: AppColors.white,
                             strokeWidth: 2,
                           ),
                         )
                       : const Text(
                           "Verify & continue",
                           style: TextStyle(
-                            color: AppColors.black,
+                            color: AppColors.white,
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
                           ),
                         ),
                 ),
               ),
-
-              const SizedBox(height: 30),
             ],
           ),
         ),

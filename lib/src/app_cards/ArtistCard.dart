@@ -4,7 +4,7 @@ import 'package:my_musics/app/theme_data/app_colors.dart';
 class ArtistCard extends StatelessWidget {
   final String name;
   final String image;
-  final String subtitle; // e.g. "1 Album | 20 Songs"
+  final String subtitle;
   final VoidCallback onTap;
 
   const ArtistCard({
@@ -22,26 +22,45 @@ class ArtistCard extends StatelessWidget {
         width: 100,
         child: Column(
           children: [
-            // Circular artist image
-            ClipOval(
-              child: Image.network(
-                image,
-                height: 80,
-                width: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 80,
-                    width: 80,
-                    color: Colors.grey[800],
-                    child: const Icon(Icons.person, color: Colors.grey),
-                  );
-                },
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  image,
+                  height: 80,
+                  width: 80,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.surface,
+                            AppColors.primary.withOpacity(0.3),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Icon(Icons.person_rounded,
+                          color: AppColors.primary.withOpacity(0.5), size: 32),
+                    );
+                  },
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-
-            // Artist name
+            const SizedBox(height: 10),
             Text(
               name,
               maxLines: 1,
@@ -49,19 +68,21 @@ class ArtistCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 2),
-
-            // Subtitle (album/song count)
             Text(
               subtitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey, fontSize: 11),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
