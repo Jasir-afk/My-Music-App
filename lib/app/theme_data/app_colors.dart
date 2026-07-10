@@ -3,74 +3,53 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ===========================
-  // Primary Colors
-  // ===========================
+  static const Color primary = Color(0xFFFD3C5B); // Crimson Red
+  static const Color primaryLight = Color(0xFFFF6B81);
+  static const Color primaryDark = Color(0xFFC91E3A);
 
-  static const Color primary = Color(0xFFFF8A00);
-  static const Color primaryLight = Color(0xFFFFA726);
-  static const Color primaryDark = Color(0xFFE67E00);
+  static const Color accent = Color(0xFFC77DFF); // Light violet/purple accent
+  static const Color accentLight = Color(0xFFE0AAFF);
 
-  // ===========================
   // Background Colors
-  // ===========================
+  static const Color background = Color(0xFF0F0F13); // Deep slate-dark background
+  static const Color scaffold = Color(0xFF0F0F13);
+  static const Color card = Color(0xFF1B1B22); // Card color
+  static const Color surface = Color(0xFF262630); // Raised elements
 
-  static const Color background = Color(0xFF121212);
-  static const Color scaffold = Color(0xFF181818);
-  static const Color card = Color(0xFF1F1F1F);
-
-  // ===========================
   // Text Colors
-  // ===========================
-
   static const Color white = Colors.white;
   static const Color black = Colors.black;
-
   static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFFB3B3B3);
-  static const Color textHint = Color(0xFF7C7C7C);
+  static const Color textSecondary = Color(0xFF8F8F99); // Subtle gray-blue text
+  static const Color textHint = Color(0xFF5A5A66);
 
-  // ===========================
   // Icon Colors
-  // ===========================
-
   static const Color icon = Colors.white;
-  static const Color iconInactive = Color(0xFF7C7C7C);
+  static const Color iconInactive = Color(0xFF72727D);
 
-  // ===========================
   // Divider & Border
-  // ===========================
+  static const Color divider = Color(0xFF22222B);
+  static const Color border = Color(0xFF282835);
 
-  static const Color divider = Color(0xFF2B2B2B);
-  static const Color border = Color(0xFF333333);
-
-  // ===========================
   // Status Colors
-  // ===========================
+  static const Color success = Color(0xFF00E676);
+  static const Color error = Color(0xFFFF1744);
+  static const Color warning = Color(0xFFFFD740);
+  static const Color info = Color(0xFF40C4FF);
 
-  static const Color success = Color(0xFF4CAF50);
-  static const Color error = Color(0xFFE53935);
-  static const Color warning = Color(0xFFFFC107);
-  static const Color info = Color(0xFF2196F3);
-
-  // ===========================
   // Player Colors
-  // ===========================
-
   static const Color playButton = primary;
   static const Color progress = primary;
-  static const Color progressBackground = Color(0xFF3A3A3A);
+  static const Color progressBackground = Color(0xFF282835);
 
-  // ===========================
   // Navigation
-  // ===========================
-
   static const Color navSelected = primary;
-  static const Color navUnselected = Color(0xFF8A8A8A);
+  static const Color navUnselected = Color(0xFF72727D);
 
-  // ===========================
-  // Misc
-  // ===========================
+  // Gradient helpers
+  static const List<Color> primaryGradient = [Color(0xFFFD3C5B), Color(0xFFFF6B81)];
+  static const List<Color> accentGradient = [Color(0xFFC77DFF), Color(0xFFE0AAFF)];
+  static const List<Color> subtleGradient = [Color(0xFFFD3C5B), Color(0xFFC77DFF)];
 
   static const Color transparent = Colors.transparent;
 }

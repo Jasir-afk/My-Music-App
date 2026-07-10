@@ -5,6 +5,26 @@ class SongsScreen extends StatelessWidget {
   const SongsScreen({super.key});
 
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: AppColors.black);
+    return Scaffold(
+      backgroundColor: AppColors.black,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.music_note_rounded,
+                size: 48, color: AppColors.textHint),
+            const SizedBox(height: 16),
+            const Text(
+              "No songs yet",
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

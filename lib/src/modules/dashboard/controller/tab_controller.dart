@@ -7,7 +7,7 @@ class TabBarController extends GetxController
 
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
   }
 
   void onClose() {

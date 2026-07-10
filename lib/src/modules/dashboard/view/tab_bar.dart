@@ -13,41 +13,39 @@ class HomeTabBar extends StatelessWidget {
       preferredSize: const Size.fromHeight(48),
       child: TabBar(
         controller: controller.tabController,
-        isScrollable: true,
-        indicatorSize: TabBarIndicatorSize.label,
-
-        indicator: UnderlineTabIndicator(
-          borderSide: BorderSide(color: AppColors.primary, width: 3),
-          borderRadius: BorderRadius.circular(20),
-          insets: const EdgeInsets.symmetric(horizontal: 18),
+        isScrollable: false,
+        tabAlignment: TabAlignment.center,
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicatorPadding: const EdgeInsets.symmetric(
+          vertical: 6,
+          horizontal: 4,
         ),
-
-        labelColor: AppColors.primary,
+        indicator: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            colors: AppColors.primaryGradient,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        labelColor: AppColors.white,
         unselectedLabelColor: AppColors.textSecondary,
-
         labelStyle: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w700,
-          letterSpacing: .3,
+          letterSpacing: 0.2,
         ),
-
         unselectedLabelStyle: const TextStyle(
-          fontSize: 15,
+          fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-
-        labelPadding: const EdgeInsets.symmetric(horizontal: 18),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-
+        labelPadding: const EdgeInsets.symmetric(horizontal: 28),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         dividerColor: Colors.transparent,
-        overlayColor: WidgetStatePropertyAll(Colors.transparent),
-
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         tabs: const [
           Tab(text: "Suggested"),
-          Tab(text: "Songs"),
-          Tab(text: "Artists"),
-          Tab(text: "Albums"),
-          Tab(text: "Folders"),
+          Tab(text: "Trending"),
         ],
       ),
     );
