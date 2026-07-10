@@ -9,14 +9,16 @@ class PlaylistDetailScreen extends StatelessWidget {
   PlaylistDetailScreen({super.key, required this.playlistId});
 
   final PlaylistController playlistController = PlaylistController.to;
-  final AudioService audioService = AudioService.to;
+  final PlaybackService audioService = PlaybackService.to;
 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Obx(() {
-          final index = playlistController.playlists.indexWhere((p) => p.id == playlistId);
+          final index = playlistController.playlists.indexWhere(
+            (p) => p.id == playlistId,
+          );
           if (index == -1) {
             return const Center(
               child: Text(
@@ -40,8 +42,11 @@ class PlaylistDetailScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.white, size: 20),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: AppColors.white,
+                        size: 20,
+                      ),
                     ),
                     Expanded(
                       child: Text(
@@ -57,9 +62,13 @@ class PlaylistDetailScreen extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => _confirmDeletePlaylist(context, playlist.name),
-                      icon: const Icon(Icons.delete_outline_rounded,
-                          color: AppColors.primary, size: 22),
+                      onPressed: () =>
+                          _confirmDeletePlaylist(context, playlist.name),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppColors.primary,
+                        size: 22,
+                      ),
                     ),
                   ],
                 ),
@@ -82,101 +91,163 @@ class PlaylistDetailScreen extends StatelessWidget {
                 // Song list inside the playlist
                 Expanded(
                   child: songs.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.music_off_rounded,
-                                size: 48,
-                                color: AppColors.textHint,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                "No songs inside playlist",
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: songs.length,
-                          itemBuilder: (context, index) {
-                            final song = songs[index];
-                            return InkWell(
-                              onTap: () {
-                                audioService.setPlaylist(songs, index);
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                                child: Row(
+                      ? RefreshIndicator(
+                          onRefresh: () async {
+                            // Playlists are stored locally, no need to refresh from API
+                          },
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.card,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        song.artwork ?? '',
-                                        height: 52,
-                                        width: 52,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Container(
-                                          height: 52,
-                                          width: 52,
-                                          color: AppColors.surface,
-                                          child: const Icon(Icons.music_note_rounded,
-                                              color: AppColors.primary, size: 24),
-                                        ),
-                                      ),
+                                    Icon(
+                                      Icons.music_off_rounded,
+                                      size: 48,
+                                      color: AppColors.textHint,
                                     ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            song.title ?? 'Unknown Track',
-                                            style: const TextStyle(
-                                              color: AppColors.white,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            song.artist ?? 'Unknown Artist',
-                                            style: const TextStyle(
-                                              color: AppColors.textSecondary,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        playlistController.removeSongFromPlaylist(
-                                            playlistId, song.id!);
-                                      },
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline_rounded,
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "No songs inside playlist",
+                                      style: TextStyle(
                                         color: AppColors.textSecondary,
-                                        size: 20,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            );
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: () async {
+                            // Playlists are stored locally, no need to refresh from API
                           },
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.card,
+                          child: ListView.builder(
+                            itemCount: songs.length,
+                            itemBuilder: (context, index) {
+                              final song = songs[index];
+                              return InkWell(
+                                onTap: () {
+                                  audioService.setPlaylist(songs, index);
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 4,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          song.artwork ?? '',
+                                          height: 52,
+                                          width: 52,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              Container(
+                                                height: 52,
+                                                width: 52,
+                                                color: AppColors.surface,
+                                                child: const Icon(
+                                                  Icons.music_note_rounded,
+                                                  color: AppColors.primary,
+                                                  size: 24,
+                                                ),
+                                              ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              song.title ?? 'Unknown Track',
+                                              style: const TextStyle(
+                                                color: AppColors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              song.artist ?? 'Unknown Artist',
+                                              style: const TextStyle(
+                                                color: AppColors.textSecondary,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Obx(() {
+                                        final isCurrentTrack =
+                                            audioService
+                                                .currentTrack
+                                                .value
+                                                ?.id ==
+                                            song.id;
+                                        final isPlaying =
+                                            audioService.isPlaying.value &&
+                                            isCurrentTrack;
+                                        return IconButton(
+                                          onPressed: () {
+                                            if (isCurrentTrack) {
+                                              audioService.togglePlayPause();
+                                            } else {
+                                              audioService.setPlaylist(
+                                                songs,
+                                                index,
+                                              );
+                                            }
+                                          },
+                                          icon: Icon(
+                                            isPlaying
+                                                ? Icons.pause_circle_rounded
+                                                : Icons
+                                                      .play_circle_outline_rounded,
+                                            color: AppColors.primary,
+                                            size: 28,
+                                          ),
+                                        );
+                                      }),
+                                      IconButton(
+                                        onPressed: () {
+                                          playlistController
+                                              .removeSongFromPlaylist(
+                                                playlistId,
+                                                song.id!,
+                                              );
+                                        },
+                                        icon: const Icon(
+                                          Icons.remove_circle_outline_rounded,
+                                          color: AppColors.textSecondary,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                 ),
               ],

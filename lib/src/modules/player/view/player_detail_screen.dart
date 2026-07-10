@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/app/services/audio_service.dart';
 import 'package:my_musics/src/modules/homescreen/controller/home_controller.dart';
@@ -9,7 +10,7 @@ import 'package:my_musics/src/modules/Playlist/controller/playlist_controller.da
 class PlayerDetailScreen extends StatelessWidget {
   PlayerDetailScreen({super.key});
 
-  final AudioService audioService = AudioService.to;
+  final PlaybackService audioService = PlaybackService.to;
   final HomeController homeController = Get.find<HomeController>();
 
   Widget build(BuildContext context) {
@@ -45,8 +46,16 @@ class PlayerDetailScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(track.artwork!),
+                      image: CachedNetworkImageProvider(
+                        track.artwork!,
+                        errorListener: (error) {
+                          print('Error loading artwork: $error');
+                        },
+                      ),
                       fit: BoxFit.cover,
+                      onError: (exception, stackTrace) {
+                        print('Image load error: $exception');
+                      },
                     ),
                   ),
                   child: BackdropFilter(

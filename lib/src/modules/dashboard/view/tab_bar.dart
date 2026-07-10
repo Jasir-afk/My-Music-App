@@ -13,9 +13,13 @@ class HomeTabBar extends StatelessWidget {
       preferredSize: const Size.fromHeight(48),
       child: TabBar(
         controller: controller.tabController,
-        isScrollable: true,
+        isScrollable: false,
+        tabAlignment: TabAlignment.center,
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        indicatorPadding: const EdgeInsets.symmetric(
+          vertical: 6,
+          horizontal: 4,
+        ),
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: const LinearGradient(

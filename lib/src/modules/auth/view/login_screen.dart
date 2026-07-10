@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/auth/controller/auth_controller.dart';
 import 'package:my_musics/src/modules/auth/view/otp-screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginController extends GetxController {
+  final TextEditingController phoneController = TextEditingController();
+  final RxBool isLoading = false.obs;
+  final AuthController authController = AuthController.to;
 
-  State<LoginScreen> createState() => _LoginScreenState();
-}
+  void onClose() {
+    phoneController.dispose();
+    super.onClose();
+  }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
-  final AuthController _authController = AuthController.to;
-  bool _isLoading = false;
-
-  void _sendOTP() async {
-    final phoneNumber = _phoneController.text.trim();
+  Future<void> sendOTP(BuildContext context) async {
+    final phoneNumber = phoneController.text.trim();
 
     if (phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -24,12 +24,12 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    isLoading.value = true;
 
-    await _authController.sendOTP(
+    await authController.sendOTP(
       phoneNumber: "+91$phoneNumber",
       onCodeSent: (verificationId) {
-        setState(() => _isLoading = false);
+        isLoading.value = false;
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -41,24 +41,21 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       },
       onError: (error) {
-        setState(() => _isLoading = false);
+        isLoading.value = false;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(error)));
       },
     );
   }
+}
 
-  void dispose() {
-    _phoneController.dispose();
-    super.dispose();
-  }
-
-  void initState() {
-    super.initState();
-  }
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -147,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Expanded(
                         child: TextField(
                           cursorColor: AppColors.primary,
-                          controller: _phoneController,
+                          controller: controller.phoneController,
                           keyboardType: TextInputType.phone,
                           style: const TextStyle(
                             color: AppColors.white,
@@ -167,51 +164,55 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                Container(
-                  width: double.infinity,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    gradient: const LinearGradient(
-                      colors: AppColors.primaryGradient,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
+                Obx(
+                  () => Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: AppColors.primaryGradient,
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _sendOTP,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.3),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: AppColors.white,
-                              strokeWidth: 2,
+                    child: ElevatedButton(
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : () => controller.sendOTP(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: controller.isLoading.value
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: AppColors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Send OTP",
+                              style: TextStyle(
+                                color: AppColors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
                             ),
-                          )
-                        : const Text(
-                            "Send OTP",
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

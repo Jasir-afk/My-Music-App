@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:my_musics/app/apis/api_music.dart';
-import 'package:my_musics/app/apis/dio_client.dart';
+import 'package:my_musics/app/api/api_urls.dart';
+import 'package:my_musics/app/api/dio_client.dart';
 
 class AuthService extends GetxController {
   static AuthService get to => Get.find();

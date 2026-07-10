@@ -6,7 +6,6 @@ import 'package:my_musics/src/modules/initial_binding/initial_binding.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(const MyApp());
 }
 
@@ -21,11 +20,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.background,
-        colorScheme: ColorScheme.dark(
-          primary: AppColors.primary,
-          secondary: AppColors.accent,
-          surface: AppColors.surface,
-        ),
+        // colorScheme: ColorScheme.dark(
+        //   primary: AppColors.primary,
+        //   secondary: AppColors.accent,
+        //   surface: AppColors.surface,
+        // ),
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: AppColors.primary,
           selectionColor: AppColors.primaryLight,
@@ -39,10 +38,7 @@ class MyApp extends StatelessWidget {
           behavior: SnackBarBehavior.floating,
         ),
       ),
-      routes: {
-        '/home': (context) => BottomNavScreen(),
-      },
+      routes: {'/home': (context) => BottomNavScreen()},
     );
   }
 }
-

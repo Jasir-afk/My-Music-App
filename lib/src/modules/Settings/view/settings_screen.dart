@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class SettingsController extends GetxController {
+  final RxBool isHighQuality = true.obs;
+  final RxBool isOfflineMode = false.obs;
+  final RxBool isNotificationsEnabled = true.obs;
 
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  void toggleHighQuality(bool value) => isHighQuality.value = value;
+  void toggleOfflineMode(bool value) => isOfflineMode.value = value;
+  void toggleNotifications(bool value) => isNotificationsEnabled.value = value;
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool isHighQuality = true;
-  bool isOfflineMode = false;
-  bool isNotificationsEnabled = true;
-
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
 
   Widget build(BuildContext context) {
+    final controller = Get.put(SettingsController());
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -23,7 +26,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title Header Row
               const Text(
                 "Settings",
                 style: TextStyle(
@@ -34,7 +36,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Profile Section card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -79,7 +80,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
@@ -99,21 +103,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Settings Categories
               _buildSectionTitle("Audio Playback"),
-              _buildSettingTile(
-                icon: Icons.high_quality_rounded,
-                iconColor: const Color(0xFFC77DFF),
-                title: "High Quality Audio",
-                subtitle: "Stream at 320kbps for premium sound",
-                trailing: Switch(
-                  value: isHighQuality,
-                  activeColor: AppColors.primary,
-                  onChanged: (val) {
-                    setState(() {
-                      isHighQuality = val;
-                    });
-                  },
+              Obx(
+                () => _buildSettingTile(
+                  icon: Icons.high_quality_rounded,
+                  iconColor: const Color(0xFFC77DFF),
+                  title: "High Quality Audio",
+                  subtitle: "Stream at 320kbps for premium sound",
+                  trailing: Switch(
+                    value: controller.isHighQuality.value,
+                    activeColor: AppColors.primary,
+                    onChanged: controller.toggleHighQuality,
+                  ),
                 ),
               ),
               _buildSettingTile(
@@ -123,37 +124,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: "Adjust frequency bands & custom presets",
                 onTap: () {},
               ),
-              _buildSettingTile(
-                icon: Icons.download_done_rounded,
-                iconColor: const Color(0xFF00E676),
-                title: "Offline Mode",
-                subtitle: "Only play downloaded tracks",
-                trailing: Switch(
-                  value: isOfflineMode,
-                  activeColor: AppColors.primary,
-                  onChanged: (val) {
-                    setState(() {
-                      isOfflineMode = val;
-                    });
-                  },
+              Obx(
+                () => _buildSettingTile(
+                  icon: Icons.download_done_rounded,
+                  iconColor: const Color(0xFF00E676),
+                  title: "Offline Mode",
+                  subtitle: "Only play downloaded tracks",
+                  trailing: Switch(
+                    value: controller.isOfflineMode.value,
+                    activeColor: AppColors.primary,
+                    onChanged: controller.toggleOfflineMode,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
               _buildSectionTitle("Notifications"),
-              _buildSettingTile(
-                icon: Icons.notifications_active_rounded,
-                iconColor: const Color(0xFF40C4FF),
-                title: "Push Notifications",
-                subtitle: "Get updates on new releases & playlists",
-                trailing: Switch(
-                  value: isNotificationsEnabled,
-                  activeColor: AppColors.primary,
-                  onChanged: (val) {
-                    setState(() {
-                      isNotificationsEnabled = val;
-                    });
-                  },
+              Obx(
+                () => _buildSettingTile(
+                  icon: Icons.notifications_active_rounded,
+                  iconColor: const Color(0xFF40C4FF),
+                  title: "Push Notifications",
+                  subtitle: "Get updates on new releases & playlists",
+                  trailing: Switch(
+                    value: controller.isNotificationsEnabled.value,
+                    activeColor: AppColors.primary,
+                    onChanged: controller.toggleNotifications,
+                  ),
                 ),
               ),
 
@@ -176,7 +173,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: "Log Out",
                     titleStyle: const TextStyle(color: AppColors.white),
                     middleText: "Are you sure you want to log out?",
-                    middleTextStyle: const TextStyle(color: AppColors.textSecondary),
+                    middleTextStyle: const TextStyle(
+                      color: AppColors.textSecondary,
+                    ),
                     backgroundColor: AppColors.card,
                     textConfirm: "Yes",
                     textCancel: "Cancel",
@@ -261,7 +260,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        trailing: trailing ??
+        trailing:
+            trailing ??
             (onTap != null
                 ? const Icon(
                     Icons.arrow_forward_ios_rounded,

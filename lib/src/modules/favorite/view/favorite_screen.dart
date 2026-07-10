@@ -8,8 +8,7 @@ class FavoriteScreen extends StatelessWidget {
   FavoriteScreen({super.key});
 
   final HomeController homeController = Get.find<HomeController>();
-  final AudioService audioService = AudioService.to;
-
+  final PlaybackService audioService = PlaybackService.to;
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,120 +65,167 @@ class FavoriteScreen extends StatelessWidget {
                 child: Obx(() {
                   final list = homeController.favoriteSongs;
                   if (list.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              color: AppColors.card,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.favorite_rounded,
-                              size: 32,
-                              color: AppColors.primary,
+                    return RefreshIndicator(
+                      onRefresh: homeController.refreshFavoriteSongs,
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.card,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.card,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.favorite_rounded,
+                                    size: 32,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  "No favorites yet",
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Tap the heart icon on any song to add it here.",
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "No favorites yet",
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Tap the heart icon on any song to add it here.",
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   }
 
-                  return ListView.builder(
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      final song = list[index];
-                      return InkWell(
-                        onTap: () {
-                          audioService.setPlaylist(list, index);
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  song.artwork ?? '',
-                                  height: 52,
-                                  width: 52,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
+                  return RefreshIndicator(
+                    onRefresh: homeController.refreshFavoriteSongs,
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.card,
+                    child: ListView.builder(
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        final song = list[index];
+                        return InkWell(
+                          onTap: () {
+                            audioService.setPlaylist(list, index);
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 4,
+                            ),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    song.artwork ?? '',
                                     height: 52,
                                     width: 52,
-                                    color: AppColors.surface,
-                                    child: const Icon(Icons.music_note_rounded,
-                                        color: AppColors.primary, size: 24),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      height: 52,
+                                      width: 52,
+                                      color: AppColors.surface,
+                                      child: const Icon(
+                                        Icons.music_note_rounded,
+                                        color: AppColors.primary,
+                                        size: 24,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      song.title ?? 'Unknown Track',
-                                      style: const TextStyle(
-                                        color: AppColors.white,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        song.title ?? 'Unknown Track',
+                                        style: const TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      song.artist ?? 'Unknown Artist',
-                                      style: const TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        song.artist ?? 'Unknown Artist',
+                                        style: const TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                    ],
+                                  ),
+                                ),
+                                Obx(() {
+                                  final isCurrentTrack =
+                                      audioService.currentTrack.value?.id ==
+                                      song.id;
+                                  final isPlaying =
+                                      audioService.isPlaying.value &&
+                                      isCurrentTrack;
+                                  return IconButton(
+                                    onPressed: () {
+                                      if (isCurrentTrack) {
+                                        audioService.togglePlayPause();
+                                      } else {
+                                        audioService.setPlaylist(list, index);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      isPlaying
+                                          ? Icons.pause_circle_rounded
+                                          : Icons.play_circle_outline_rounded,
+                                      color: AppColors.primary,
+                                      size: 28,
                                     ),
-                                  ],
+                                  );
+                                }),
+                                IconButton(
+                                  onPressed: () {
+                                    homeController.toggleFavorite(song);
+                                  },
+                                  icon: const Icon(
+                                    Icons.favorite_rounded,
+                                    color: AppColors.primary,
+                                    size: 20,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  homeController.toggleFavorite(song);
-                                },
-                                icon: const Icon(
-                                  Icons.favorite_rounded,
-                                  color: AppColors.primary,
-                                  size: 20,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 }),
               ),

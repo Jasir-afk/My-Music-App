@@ -14,7 +14,7 @@ class BottomNavScreen extends StatelessWidget {
   BottomNavScreen({super.key});
 
   final BottomNavController controller = Get.put(BottomNavController());
-  final AudioService audioService = AudioService.to;
+  final PlaybackService audioService = PlaybackService.to;
 
   final List<Widget> pages = [
     HomeScreen(),
@@ -68,22 +68,38 @@ class BottomNavScreen extends StatelessWidget {
                     items: [
                       BottomNavigationBarItem(
                         icon: _buildNavIcon(Icons.home_rounded, 0),
-                        activeIcon: _buildNavIcon(Icons.home_rounded, 0, selected: true),
+                        activeIcon: _buildNavIcon(
+                          Icons.home_rounded,
+                          0,
+                          selected: true,
+                        ),
                         label: "Home",
                       ),
                       BottomNavigationBarItem(
                         icon: _buildNavIcon(Icons.favorite_rounded, 1),
-                        activeIcon: _buildNavIcon(Icons.favorite_rounded, 1, selected: true),
+                        activeIcon: _buildNavIcon(
+                          Icons.favorite_rounded,
+                          1,
+                          selected: true,
+                        ),
                         label: "Favorites",
                       ),
                       BottomNavigationBarItem(
                         icon: _buildNavIcon(Icons.playlist_play_rounded, 2),
-                        activeIcon: _buildNavIcon(Icons.playlist_play_rounded, 2, selected: true),
+                        activeIcon: _buildNavIcon(
+                          Icons.playlist_play_rounded,
+                          2,
+                          selected: true,
+                        ),
                         label: "Playlist",
                       ),
                       BottomNavigationBarItem(
                         icon: _buildNavIcon(Icons.settings_rounded, 3),
-                        activeIcon: _buildNavIcon(Icons.settings_rounded, 3, selected: true),
+                        activeIcon: _buildNavIcon(
+                          Icons.settings_rounded,
+                          3,
+                          selected: true,
+                        ),
                         label: "Settings",
                       ),
                     ],
@@ -105,7 +121,7 @@ class BottomNavScreen extends StatelessWidget {
       final isPlaying = audioService.isPlaying.value;
       final position = audioService.position.value;
       final duration = audioService.duration.value;
-      
+
       double progress = 0.0;
       if (duration.inMilliseconds > 0) {
         progress = position.inMilliseconds / duration.inMilliseconds;
@@ -143,11 +159,16 @@ class BottomNavScreen extends StatelessWidget {
                 LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
                   backgroundColor: AppColors.white.withOpacity(0.08),
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.primary,
+                  ),
                   minHeight: 2,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
                       // Song image
@@ -164,8 +185,11 @@ class BottomNavScreen extends StatelessWidget {
                               height: 44,
                               width: 44,
                               color: AppColors.surface,
-                              child: const Icon(Icons.music_note_rounded,
-                                  color: AppColors.primary, size: 20),
+                              child: const Icon(
+                                Icons.music_note_rounded,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
@@ -205,7 +229,9 @@ class BottomNavScreen extends StatelessWidget {
                       IconButton(
                         onPressed: audioService.togglePlayPause,
                         icon: Icon(
-                          isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                          isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
                           color: AppColors.white,
                           size: 28,
                         ),

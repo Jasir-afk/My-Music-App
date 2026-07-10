@@ -1,14 +1,17 @@
-import 'package:my_musics/app/apis/api_music.dart';
-import 'package:my_musics/app/apis/dio_client.dart';
+import 'package:my_musics/app/api/api_urls.dart';
+import 'package:my_musics/app/api/dio_client.dart';
 import 'package:my_musics/src/modules/homescreen/model/track_model.dart';
 
 class HomeRepository {
   /// Get trending songs
-  Future<List<TrackModel>> getTrendingSongs() async {
+  Future<List<TrackModel>> getTrendingSongs({
+    int offset = 0,
+    int limit = 20,
+  }) async {
     try {
       final response = await DioClient.dio.get(
         ApiMusic.trendingTracks,
-        queryParameters: {'limit': 20},
+        queryParameters: {'limit': limit, 'offset': offset},
       );
 
       if (response.data['data'] != null) {
@@ -127,6 +130,33 @@ class HomeRepository {
       return null;
     } catch (e) {
       throw Exception('Failed to fetch stream URL: $e');
+    }
+  }
+
+  /// Get songs by artist
+  Future<List<TrackModel>> getSongsByArtist({
+    required String artistName,
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await DioClient.dio.get(
+        ApiMusic.searchTracks,
+        queryParameters: {
+          'query': artistName,
+          'limit': limit,
+          'offset': offset,
+        },
+      );
+
+      if (response.data['data'] != null) {
+        return (response.data['data'] as List)
+            .map((json) => TrackModel.fromJson(json))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to fetch artist songs: $e');
     }
   }
 }

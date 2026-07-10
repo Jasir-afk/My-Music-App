@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:get/get.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:my_musics/src/modules/homescreen/model/track_model.dart';
 
 enum RepeatMode { off, one, all }
 
-class AudioService extends GetxController {
-  static AudioService get to => Get.find<AudioService>();
+class PlaybackService extends GetxController {
+  static PlaybackService get to => Get.find<PlaybackService>();
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -29,6 +30,7 @@ class AudioService extends GetxController {
 
     _audioPlayer.onPlayerStateChanged.listen((state) {
       isPlaying.value = state == PlayerState.playing;
+      _updatePlaybackState();
     });
 
     _audioPlayer.onDurationChanged.listen((newDuration) {
@@ -37,6 +39,7 @@ class AudioService extends GetxController {
 
     _audioPlayer.onPositionChanged.listen((newPosition) {
       position.value = newPosition;
+      _updateMediaItemPosition();
     });
 
     _audioPlayer.onPlayerComplete.listen((event) {
@@ -46,10 +49,13 @@ class AudioService extends GetxController {
       );
       _onTrackComplete();
     });
+
+    _initAudioService();
   }
 
   void onClose() {
     _audioPlayer.dispose();
+    AudioService.stop();
     super.onClose();
   }
 
@@ -133,6 +139,8 @@ class AudioService extends GetxController {
       await _audioPlayer.stop();
       await _audioPlayer.play(UrlSource(streamUrl));
       isPlaying.value = true;
+
+      await _setMediaItem(track);
     } catch (e) {
       print("Error playing audio: $e");
       Get.snackbar(
@@ -150,6 +158,7 @@ class AudioService extends GetxController {
     } else {
       await _audioPlayer.resume();
     }
+    _updatePlaybackState();
   }
 
   Future<void> seek(Duration newPosition) async {
@@ -175,5 +184,111 @@ class AudioService extends GetxController {
   Future<void> setVolume(double value) async {
     volume.value = value;
     await _audioPlayer.setVolume(value);
+  }
+
+  // Audio Service Methods
+  Future<void> _initAudioService() async {
+    await AudioService.init(
+      builder: () => AudioPlayerHandler(this),
+      config: AudioServiceConfig(
+        androidNotificationChannelName: 'My Music',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: false,
+      ),
+    );
+  }
+
+  Future<void> _setMediaItem(TrackModel track) async {
+    // Media item is set by the handler
+  }
+
+  Future<void> _updatePlaybackState() async {
+    // Playback state is managed by the handler
+  }
+
+  Future<void> _updateMediaItemPosition() async {
+    // Media item position is managed by the handler
+  }
+}
+
+// Audio Player Handler for background playback
+class AudioPlayerHandler extends BaseAudioHandler {
+  final PlaybackService _playbackService;
+
+  AudioPlayerHandler(this._playbackService) {
+    _playbackService.isPlaying.listen((playing) {
+      playbackState.add(
+        playbackState.value.copyWith(
+          controls: [
+            MediaControl.skipToPrevious,
+            if (playing) MediaControl.pause else MediaControl.play,
+            MediaControl.skipToNext,
+          ],
+          processingState: playing
+              ? AudioProcessingState.ready
+              : AudioProcessingState.idle,
+          playing: playing,
+        ),
+      );
+    });
+
+    _playbackService.currentTrack.listen((track) {
+      if (track != null) {
+        mediaItem.add(
+          MediaItem(
+            id: track.id ?? '',
+            album: 'My Music',
+            title: track.title ?? 'Unknown Track',
+            artist: track.artist ?? 'Unknown Artist',
+            artUri: track.artwork != null ? Uri.parse(track.artwork!) : null,
+            duration: _playbackService.duration.value,
+          ),
+        );
+      }
+    });
+
+    _playbackService.position.listen((position) {
+      playbackState.add(playbackState.value.copyWith(updatePosition: position));
+    });
+  }
+
+  Future<void> play() async {
+    if (!_playbackService.isPlaying.value) {
+      await _playbackService.togglePlayPause();
+    }
+  }
+
+  Future<void> pause() async {
+    if (_playbackService.isPlaying.value) {
+      await _playbackService.togglePlayPause();
+    }
+  }
+
+  Future<void> stop() async {
+    if (_playbackService.isPlaying.value) {
+      await _playbackService.togglePlayPause();
+    }
+  }
+
+  Future<void> seek(Duration position) async {
+    await _playbackService.seek(position);
+  }
+
+  Future<void> skipToNext() async {
+    _playbackService.playNext();
+  }
+
+  Future<void> skipToPrevious() async {
+    _playbackService.playPrevious();
+  }
+
+  Future<void> fastForward() async {
+    final currentPosition = _playbackService.position.value;
+    await _playbackService.seek(currentPosition + const Duration(seconds: 10));
+  }
+
+  Future<void> rewind() async {
+    final currentPosition = _playbackService.position.value;
+    await _playbackService.seek(currentPosition - const Duration(seconds: 10));
   }
 }

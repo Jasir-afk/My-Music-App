@@ -14,4 +14,10 @@ class ApiMusic {
   static const String recommendedTracks = '$baseUrl/tracks/recommended';
   static const String trackDetails = '$baseUrl/tracks';
   static const String streamTrack = '/stream';
+
+  // Notification endpoints
+  static String notifications(String userId) =>
+      '$baseUrl/notifications/$userId';
+  static String playlistUpdates(String userId) =>
+      '$baseUrl/notifications/$userId/playlist_updates';
 }
