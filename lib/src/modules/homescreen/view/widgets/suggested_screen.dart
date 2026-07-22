@@ -340,8 +340,9 @@ class _SuggestedScreenState extends State<SuggestedScreen> {
 
                     // Format large numbers nicely
                     String formatCount(int n) {
-                      if (n >= 1000000)
+                      if (n >= 1000000) {
                         return '${(n / 1000000).toStringAsFixed(1)}M';
+                      }
                       if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
                       return '$n';
                     }

@@ -1,15 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
+import 'package:my_musics/app/services/auth_service.dart';
+import 'package:my_musics/app/services/theme_service.dart';
+import 'package:my_musics/src/modules/Settings/view/equalizer_screen.dart';
+import 'package:my_musics/src/modules/Settings/view/about_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsController extends GetxController {
   final RxBool isHighQuality = true.obs;
   final RxBool isOfflineMode = false.obs;
   final RxBool isNotificationsEnabled = true.obs;
+  final RxString selectedLanguage = 'English'.obs;
+  final RxDouble cacheSize = 0.0.obs;
 
-  void toggleHighQuality(bool value) => isHighQuality.value = value;
-  void toggleOfflineMode(bool value) => isOfflineMode.value = value;
-  void toggleNotifications(bool value) => isNotificationsEnabled.value = value;
+  final List<String> languages = [
+    'English',
+    'Spanish',
+    'French',
+    'German',
+    'Japanese',
+    'Chinese',
+  ];
+
+  late ThemeService _themeService;
+
+  void onInit() {
+    super.onInit();
+    _themeService = Get.find<ThemeService>();
+    _loadSettings();
+    _calculateCacheSize();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    isHighQuality.value = prefs.getBool('high_quality') ?? true;
+    isOfflineMode.value = prefs.getBool('offline_mode') ?? false;
+    isNotificationsEnabled.value =
+        prefs.getBool('notifications_enabled') ?? true;
+    selectedLanguage.value = prefs.getString('language') ?? 'English';
+  }
+
+  Future<void> _saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('high_quality', isHighQuality.value);
+    await prefs.setBool('offline_mode', isOfflineMode.value);
+    await prefs.setBool('notifications_enabled', isNotificationsEnabled.value);
+    await prefs.setString('language', selectedLanguage.value);
+  }
+
+  void toggleHighQuality(bool value) {
+    isHighQuality.value = value;
+    _saveSettings();
+  }
+
+  void toggleOfflineMode(bool value) {
+    isOfflineMode.value = value;
+    _saveSettings();
+  }
+
+  void toggleNotifications(bool value) {
+    isNotificationsEnabled.value = value;
+    _saveSettings();
+  }
+
+  void toggleDarkMode(bool value) {
+    _themeService.setTheme(value);
+  }
+
+  bool get isDarkMode => _themeService.isDarkMode.value;
+
+  void setLanguage(String language) {
+    selectedLanguage.value = language;
+    _saveSettings();
+  }
+
+  Future<void> _calculateCacheSize() async {
+    // Simulate cache size calculation
+    cacheSize.value = 45.6; // MB
+  }
+
+  Future<void> clearCache() async {
+    // Simulate cache clearing
+    cacheSize.value = 0.0;
+    Get.snackbar(
+      'Cache Cleared',
+      'All cached data has been removed',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.card,
+      colorText: AppColors.white,
+    );
+  }
+
+  Future<void> logout() async {
+    final authService = Get.find<AuthService>();
+    authService.logout();
+    Get.offAllNamed('/login');
+  }
 }
 
 class SettingsScreen extends StatelessWidget {
@@ -122,7 +209,7 @@ class SettingsScreen extends StatelessWidget {
                 iconColor: const Color(0xFFFFB703),
                 title: "Equalizer",
                 subtitle: "Adjust frequency bands & custom presets",
-                onTap: () {},
+                onTap: () => Get.to(() => const EqualizerScreen()),
               ),
               Obx(
                 () => _buildSettingTile(
@@ -155,13 +242,49 @@ class SettingsScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
+              _buildSectionTitle("Appearance"),
+              Obx(
+                () => _buildSettingTile(
+                  icon: Icons.dark_mode_rounded,
+                  iconColor: const Color(0xFF7C4DFF),
+                  title: "Dark Mode",
+                  subtitle: "Switch between light and dark theme",
+                  trailing: Switch(
+                    value: ThemeService.to.isDarkMode.value,
+                    activeColor: AppColors.primary,
+                    onChanged: (value) => controller.toggleDarkMode(value),
+                  ),
+                ),
+              ),
+              _buildSettingTile(
+                icon: Icons.language_rounded,
+                iconColor: const Color(0xFF00BFA5),
+                title: "Language",
+                subtitle: controller.selectedLanguage.value,
+                onTap: () => _showLanguageDialog(controller),
+              ),
+
+              const SizedBox(height: 16),
+              _buildSectionTitle("Storage"),
+              Obx(
+                () => _buildSettingTile(
+                  icon: Icons.storage_rounded,
+                  iconColor: const Color(0xFFFF6E40),
+                  title: "Cache Size",
+                  subtitle:
+                      "${controller.cacheSize.value.toStringAsFixed(1)} MB",
+                  onTap: () => _showCacheDialog(controller),
+                ),
+              ),
+
+              const SizedBox(height: 16),
               _buildSectionTitle("General"),
               _buildSettingTile(
                 icon: Icons.info_outline_rounded,
                 iconColor: AppColors.textSecondary,
                 title: "About My Music",
                 subtitle: "Version 1.0.0 (Build 240)",
-                onTap: () {},
+                onTap: () => Get.to(() => const AboutScreen()),
               ),
               _buildSettingTile(
                 icon: Icons.logout_rounded,
@@ -182,16 +305,7 @@ class SettingsScreen extends StatelessWidget {
                     confirmTextColor: AppColors.white,
                     cancelTextColor: AppColors.primary,
                     buttonColor: AppColors.primary,
-                    onConfirm: () {
-                      Get.back();
-                      Get.snackbar(
-                        'Logout',
-                        'Logged out successfully',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: AppColors.card,
-                        colorText: AppColors.white,
-                      );
-                    },
+                    onConfirm: controller.logout,
                   );
                 },
               ),
@@ -199,6 +313,92 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog(SettingsController controller) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        title: const Text(
+          "Select Language",
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: controller.languages.length,
+            itemBuilder: (context, index) {
+              final language = controller.languages[index];
+              return Obx(
+                () => ListTile(
+                  title: Text(
+                    language,
+                    style: const TextStyle(color: AppColors.white),
+                  ),
+                  trailing: controller.selectedLanguage.value == language
+                      ? const Icon(Icons.check, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    controller.setLanguage(language);
+                    Get.back();
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCacheDialog(SettingsController controller) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        title: const Text(
+          "Clear Cache",
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Obx(
+              () => Text(
+                "Current cache size: ${controller.cacheSize.value.toStringAsFixed(1)} MB",
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Clearing cache will remove all downloaded music and images. This action cannot be undone.",
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: AppColors.primary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              controller.clearCache();
+              Get.back();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text(
+              "Clear Cache",
+              style: TextStyle(color: AppColors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

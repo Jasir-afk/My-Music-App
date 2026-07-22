@@ -13,22 +13,17 @@ class HomeTabBar extends StatelessWidget {
       preferredSize: const Size.fromHeight(48),
       child: TabBar(
         controller: controller.tabController,
-        isScrollable: false,
-        tabAlignment: TabAlignment.center,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.symmetric(
-          vertical: 6,
-          horizontal: 4,
-        ),
+        isScrollable: true,
+        indicatorSize: TabBarIndicatorSize.label,
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           gradient: const LinearGradient(
             colors: AppColors.primaryGradient,
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
         ),
-        labelColor: AppColors.white,
+        labelColor: AppColors.black,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: const TextStyle(
           fontSize: 14,
@@ -39,13 +34,16 @@ class HomeTabBar extends StatelessWidget {
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        labelPadding: const EdgeInsets.symmetric(horizontal: 28),
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         dividerColor: Colors.transparent,
-        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+        overlayColor: WidgetStatePropertyAll(Colors.transparent),
         tabs: const [
           Tab(text: "Suggested"),
-          Tab(text: "Trending"),
+          Tab(text: "Songs"),
+          Tab(text: "Artists"),
+          Tab(text: "Albums"),
+          Tab(text: "Folders"),
         ],
       ),
     );
