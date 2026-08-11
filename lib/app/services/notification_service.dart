@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:my_musics/app/api/api_urls.dart';
-import 'package:my_musics/app/api/dio_client.dart';
+import 'package:my_musics/app/network/api/api_urls.dart';
+import 'package:my_musics/app/network/api/dio_client.dart';
 import 'package:my_musics/src/modules/notifications/model/notification_model.dart';
 
 class NotificationService extends GetxController {

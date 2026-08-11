@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/homescreen/model/track_model.dart';
+import 'package:my_musics/src/modules/homescreen/model/artist_model.dart';
 import 'package:my_musics/src/modules/homescreen/repo/home_repo.dart';
 
 class HomeController extends GetxController {
@@ -13,6 +14,8 @@ class HomeController extends GetxController {
   RxList<TrackModel> latestSongs = <TrackModel>[].obs;
   RxList<TrackModel> mostLovedSongs = <TrackModel>[].obs;
   RxList<TrackModel> recommendedSongs = <TrackModel>[].obs;
+  RxList<TrackModel> relatedSongs = <TrackModel>[].obs;
+  RxList<ArtistModel> artists = <ArtistModel>[].obs;
   RxBool isLoading = false.obs;
 
   final searchController = TextEditingController();
@@ -202,6 +205,33 @@ class HomeController extends GetxController {
       print(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadRelatedSongs(
+    String artistName, {
+    String? excludeTrackId,
+  }) async {
+    try {
+      final songs = await _repository.getRelatedSongsByArtist(
+        artistName: artistName,
+        excludeTrackId: excludeTrackId,
+        limit: 10,
+      );
+      relatedSongs.assignAll(songs);
+      print("Related Songs Loaded: ${relatedSongs.length}");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> searchArtists(String query) async {
+    try {
+      final artistList = await _repository.searchArtists(query);
+      artists.assignAll(artistList);
+      print("Artists Loaded: ${artists.length}");
+    } catch (e) {
+      print(e);
     }
   }
 
