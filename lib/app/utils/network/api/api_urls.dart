@@ -4,8 +4,6 @@ class ApiMusic {
   // OAuth endpoints
   static const String authorizeUrl = '$baseUrl/oauth/authorize';
   static const String tokenUrl = '$baseUrl/oauth/token';
-  static const String redirectUrl = 'https://docs.audius.co/api/';
-
   // Track endpoints
   static const String trendingTracks = '$baseUrl/tracks/trending';
   static const String searchTracks = '$baseUrl/tracks/search';
@@ -13,7 +11,7 @@ class ApiMusic {
   static const String mostLovedTracks = '$baseUrl/tracks/most_loved';
   static const String recommendedTracks = '$baseUrl/tracks/recommended';
   static const String trackDetails = '$baseUrl/tracks';
-  static const String streamTrack = '/stream';
+  static const String streamTrack = '$baseUrl/tracks/stream';
 
   // Notification endpoints
   static String notifications(String userId) =>

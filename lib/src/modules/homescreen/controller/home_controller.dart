@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/homescreen/model/track_model.dart';
+import 'package:my_musics/src/modules/homescreen/model/artist_model.dart';
 import 'package:my_musics/src/modules/homescreen/repo/home_repo.dart';
 
 class HomeController extends GetxController {
@@ -13,11 +14,18 @@ class HomeController extends GetxController {
   RxList<TrackModel> latestSongs = <TrackModel>[].obs;
   RxList<TrackModel> mostLovedSongs = <TrackModel>[].obs;
   RxList<TrackModel> recommendedSongs = <TrackModel>[].obs;
+  RxList<TrackModel> relatedSongs = <TrackModel>[].obs;
+  RxList<ArtistModel> artists = <ArtistModel>[].obs;
   RxBool isLoading = false.obs;
 
   final searchController = TextEditingController();
   RxString searchQuery = ''.obs;
   RxList<TrackModel> favoriteSongs = <TrackModel>[].obs;
+
+  // Filter & Sort state
+  RxString sortBy = 'popular'.obs; // popular, favorited, newest, az
+  RxString filterGenre = 'all'.obs;
+  RxList<String> availableGenres = <String>[].obs;
 
   // Track loading states for each data type
   final RxBool _trendingLoaded = false.obs;
@@ -61,6 +69,7 @@ class HomeController extends GetxController {
       trendingSongs.assignAll(songs);
       _trendingLoaded.value = true;
       _trendingHasMore.value = songs.length >= _pageSize;
+      updateAvailableGenres();
       print("Trending Songs Loaded: ${trendingSongs.length}");
     } catch (e) {
       print(e);
@@ -101,6 +110,53 @@ class HomeController extends GetxController {
     _trendingHasMore.value = true;
     _trendingLoaded.value = false;
     _trendingLoadingMore.value = false;
+  }
+
+  void updateAvailableGenres() {
+    final genres = trendingSongs
+        .map((s) => s.genre)
+        .where((g) => g != null && g.isNotEmpty)
+        .map((g) => g!)
+        .toSet()
+        .toList()
+      ..sort();
+    availableGenres.assignAll(genres);
+  }
+
+  void setSortBy(String value) {
+    sortBy.value = value;
+  }
+
+  void setFilterGenre(String value) {
+    filterGenre.value = value;
+  }
+
+  List<TrackModel> getFilteredSortedSongs(List<TrackModel> songs) {
+    var result = List<TrackModel>.from(songs);
+
+    if (filterGenre.value != 'all') {
+      result = result.where((s) => s.genre == filterGenre.value).toList();
+    }
+
+    switch (sortBy.value) {
+      case 'popular':
+        result.sort((a, b) => (b.playCount ?? 0).compareTo(a.playCount ?? 0));
+        break;
+      case 'favorited':
+        result.sort(
+            (a, b) => (b.favoriteCount ?? 0).compareTo(a.favoriteCount ?? 0));
+        break;
+      case 'newest':
+        result.sort((a, b) =>
+            (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
+        break;
+      case 'az':
+        result.sort(
+            (a, b) => (a.title ?? '').compareTo(b.title ?? ''));
+        break;
+    }
+
+    return result;
   }
 
   Future<void> loadLatestSongs() async {
@@ -202,6 +258,33 @@ class HomeController extends GetxController {
       print(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadRelatedSongs(
+    String artistName, {
+    String? excludeTrackId,
+  }) async {
+    try {
+      final songs = await _repository.getRelatedSongsByArtist(
+        artistName: artistName,
+        excludeTrackId: excludeTrackId,
+        limit: 10,
+      );
+      relatedSongs.assignAll(songs);
+      print("Related Songs Loaded: ${relatedSongs.length}");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> searchArtists(String query) async {
+    try {
+      final artistList = await _repository.searchArtists(query);
+      artists.assignAll(artistList);
+      print("Artists Loaded: ${artists.length}");
+    } catch (e) {
+      print(e);
     }
   }
 

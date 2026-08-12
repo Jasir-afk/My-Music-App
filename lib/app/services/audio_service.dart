@@ -191,6 +191,7 @@ class PlaybackService extends GetxController {
     await AudioService.init(
       builder: () => AudioPlayerHandler(this),
       config: AudioServiceConfig(
+        androidNotificationChannelId: 'com.mymusic.audio',
         androidNotificationChannelName: 'My Music',
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: false,
