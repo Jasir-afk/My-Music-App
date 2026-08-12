@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/services/auth_service.dart';
-import 'package:my_musics/src/modules/homescreen/view/home_screen.dart';
-import '../auth/view/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,9 +20,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final auth = Get.find<AuthService>();
 
     if (auth.isLoggedIn) {
-      Get.offAll(() => HomeScreen());
+      Get.offAllNamed('/home');
     } else {
-      Get.offAll(() => const LoginScreen());
+      Get.offAllNamed('/login');
     }
   }
 

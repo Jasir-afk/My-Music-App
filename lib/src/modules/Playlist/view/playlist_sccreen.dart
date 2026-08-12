@@ -10,8 +10,6 @@ class PlaylistScreen extends StatelessWidget {
 
   final PlaylistController playlistController = PlaylistController.to;
 
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -109,12 +107,13 @@ class PlaylistScreen extends StatelessWidget {
                   }
 
                   return GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 15,
-                      mainAxisSpacing: 15,
-                      childAspectRatio: 1.1,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          childAspectRatio: 1.1,
+                        ),
                     itemCount: list.length,
                     itemBuilder: (context, index) {
                       final playlist = list[index];
@@ -215,42 +214,112 @@ class PlaylistScreen extends StatelessWidget {
 
   void _showCreatePlaylistDialog(BuildContext context) {
     final textController = TextEditingController();
-    Get.defaultDialog(
-      title: "New Playlist",
-      titleStyle: const TextStyle(color: AppColors.white, fontSize: 16, fontWeight: FontWeight.bold),
-      backgroundColor: AppColors.card,
-      barrierDismissible: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      content: Container(
-        margin: const EdgeInsets.only(top: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: TextField(
-          controller: textController,
-          style: const TextStyle(color: AppColors.white, fontSize: 14),
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: "Enter playlist name...",
-            hintStyle: TextStyle(color: AppColors.textHint, fontSize: 13),
-            border: InputBorder.none,
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                "New Playlist",
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border, width: 1),
+                ),
+                child: TextField(
+                  controller: textController,
+                  style: const TextStyle(color: AppColors.white, fontSize: 14),
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: "Enter playlist name...",
+                    hintStyle: TextStyle(
+                      color: AppColors.textHint,
+                      fontSize: 13,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final name = textController.text.trim();
+                        if (name.isNotEmpty) {
+                          playlistController.createPlaylist(name);
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        "Create",
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
-      textConfirm: "Create",
-      textCancel: "Cancel",
-      confirmTextColor: AppColors.white,
-      cancelTextColor: AppColors.primary,
-      buttonColor: AppColors.primary,
-      onConfirm: () {
-        final name = textController.text.trim();
-        if (name.isNotEmpty) {
-          playlistController.createPlaylist(name);
-          Get.back();
-        }
-      },
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
 import 'package:my_musics/src/modules/auth/controller/auth_controller.dart';
@@ -30,6 +31,28 @@ class LoginController extends GetxController {
       phoneNumber: "+91$phoneNumber",
       onCodeSent: (verificationId) {
         isLoading.value = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("OTP: ${authController.currentOTP}"),
+            duration: const Duration(seconds: 5),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(
+              label: "COPY",
+              textColor: Colors.white,
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: authController.currentOTP),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("OTP copied!"),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -55,7 +78,6 @@ class LoginScreen extends StatelessWidget {
 
   Widget build(BuildContext context) {
     final controller = Get.put(LoginController());
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(

@@ -9,6 +9,8 @@ class AuthController extends GetxController {
   String _currentOTP = '';
   String _currentPhoneNumber = '';
 
+  String get currentOTP => _currentOTP;
+
   Future<void> sendOTP({
     required String phoneNumber,
     required Function(String verificationId) onCodeSent,

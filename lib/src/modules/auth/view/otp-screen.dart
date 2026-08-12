@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:my_musics/app/services/auth_service.dart';
 import 'package:my_musics/app/theme_data/app_colors.dart';
@@ -79,7 +80,26 @@ class OtpController extends GetxController {
       phoneNumber: "+91$phoneNumber",
       onCodeSent: (verificationId) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("OTP resent successfully")),
+          SnackBar(
+            content: Text("OTP: ${authController.currentOTP}"),
+            duration: const Duration(seconds: 5),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(
+              label: "COPY",
+              textColor: Colors.white,
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: authController.currentOTP),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("OTP copied!"),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+          ),
         );
       },
       onError: (error) {

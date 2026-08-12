@@ -111,140 +111,127 @@ class _EqualizerScreenState extends State<EqualizerScreen> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: controller.reset,
-            child: const Text(
-              'Reset',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          Obx(() => TextButton(
+                onPressed: controller.selectedPreset.value != 'Flat'
+                    ? controller.reset
+                    : null,
+                child: Text(
+                  'Reset',
+                  style: TextStyle(
+                    color: controller.selectedPreset.value != 'Flat'
+                        ? AppColors.primary
+                        : AppColors.textHint,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Presets Section
-            const Text(
-              'Presets',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 50,
-              child: Obx(
-                () => ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.presets.length,
-                  itemBuilder: (context, index) {
-                    final preset = controller.presets[index];
+        child: Obx(() => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Presets Section
+                const Text(
+                  'Presets',
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: controller.presets.map((preset) {
                     final isSelected =
                         controller.selectedPreset.value == preset;
-                    return Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      child: FilterChip(
-                        label: Text(preset),
-                        labelStyle: TextStyle(
+                    return FilterChip(
+                      label: Text(preset),
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? AppColors.white
+                            : AppColors.textSecondary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      selected: isSelected,
+                      onSelected: (_) => controller.setPreset(preset),
+                      selectedColor: AppColors.primary,
+                      backgroundColor: AppColors.card,
+                      checkmarkColor: AppColors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
                           color: isSelected
-                              ? AppColors.white
-                              : AppColors.textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        selected: isSelected,
-                        onSelected: (_) => controller.setPreset(preset),
-                        selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.card,
-                        checkmarkColor: AppColors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.border,
-                          ),
+                              ? AppColors.primary
+                              : AppColors.border,
                         ),
                       ),
                     );
-                  },
+                  }).toList(),
                 ),
-              ),
-            ),
-            const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-            // Frequency Bands Section
-            const Text(
-              'Frequency Bands',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Bass Slider
-            Obx(
-              () => _buildSlider(
-                label: 'Bass',
-                value: controller.bass.value,
-                onChanged: (value) => controller.bass.value = value,
-                color: const Color(0xFFC77DFF),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Mid Slider
-            Obx(
-              () => _buildSlider(
-                label: 'Mid',
-                value: controller.mid.value,
-                onChanged: (value) => controller.mid.value = value,
-                color: const Color(0xFFFFB703),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Treble Slider
-            Obx(
-              () => _buildSlider(
-                label: 'Treble',
-                value: controller.treble.value,
-                onChanged: (value) => controller.treble.value = value,
-                color: const Color(0xFF00E676),
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Visualizer
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Obx(
-                () => CustomPaint(
-                  size: const Size(double.infinity, 120),
-                  painter: EqualizerPainter(
-                    bass: controller.bass.value,
-                    mid: controller.mid.value,
-                    treble: controller.treble.value,
+                // Frequency Bands Section
+                const Text(
+                  'Frequency Bands',
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
+                const SizedBox(height: 24),
+
+                // Bass Slider
+                _buildSlider(
+                  label: 'Bass',
+                  value: controller.bass.value,
+                  onChanged: (value) => controller.bass.value = value,
+                  color: const Color(0xFFC77DFF),
+                ),
+                const SizedBox(height: 24),
+
+                // Mid Slider
+                _buildSlider(
+                  label: 'Mid',
+                  value: controller.mid.value,
+                  onChanged: (value) => controller.mid.value = value,
+                  color: const Color(0xFFFFB703),
+                ),
+                const SizedBox(height: 24),
+
+                // Treble Slider
+                _buildSlider(
+                  label: 'Treble',
+                  value: controller.treble.value,
+                  onChanged: (value) => controller.treble.value = value,
+                  color: const Color(0xFF00E676),
+                ),
+                const SizedBox(height: 32),
+
+                // Visualizer
+                Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: CustomPaint(
+                    size: const Size(double.infinity, 120),
+                    painter: EqualizerPainter(
+                      bass: controller.bass.value,
+                      mid: controller.mid.value,
+                      treble: controller.treble.value,
+                    ),
+                  ),
+                ),
+              ],
+            )),
       ),
     );
   }
@@ -313,42 +300,49 @@ class EqualizerPainter extends CustomPainter {
   });
 
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
     final width = size.width;
     final height = size.height;
+    final barCount = 40;
+    final barWidth = width / barCount - 2;
+    final spacing = 2.0;
 
-    path.moveTo(0, height);
+    for (int i = 0; i < barCount; i++) {
+      final normalizedPos = i / barCount;
 
-    // Draw curve based on EQ values
-    final bassHeight = height * 0.3 + (bass * height * 0.3);
-    final midHeight = height * 0.5 + (mid * height * 0.3);
-    final trebleHeight = height * 0.4 + (treble * height * 0.3);
+      double barHeight;
+      if (normalizedPos < 0.33) {
+        barHeight = height * (0.3 + bass * 0.5) * (0.6 + normalizedPos * 1.2);
+      } else if (normalizedPos < 0.66) {
+        barHeight =
+            height * (0.3 + mid * 0.5) * (0.7 + (normalizedPos - 0.33) * 0.9);
+      } else {
+        barHeight = height *
+            (0.3 + treble * 0.5) *
+            (0.5 + (normalizedPos - 0.66) * 1.5);
+      }
 
-    path.lineTo(0, bassHeight);
-    path.quadraticBezierTo(width * 0.25, bassHeight, width * 0.33, midHeight);
-    path.quadraticBezierTo(width * 0.5, midHeight, width * 0.66, trebleHeight);
-    path.quadraticBezierTo(width * 0.83, trebleHeight, width, height * 0.5);
-    path.lineTo(width, height);
-    path.close();
+      barHeight = barHeight.clamp(height * 0.05, height * 0.9);
 
-    canvas.drawPath(path, paint);
+      final x = i * (barWidth + spacing) + spacing;
+      final y = height - barHeight;
 
-    // Draw gradient overlay
-    final gradientPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          AppColors.primary.withOpacity(0.6),
-          AppColors.primary.withOpacity(0.1),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, width, height));
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, y, barWidth, barHeight),
+        const Radius.circular(3),
+      );
 
-    canvas.drawPath(path, gradientPaint);
+      final paint = Paint()..style = PaintingStyle.fill;
+
+      final hue = 340 + normalizedPos * 40;
+      paint.color = HSLColor.fromAHSL(1.0, hue, 0.7, 0.6).toColor();
+
+      canvas.drawRRect(rect, paint);
+
+      final glowPaint = Paint()
+        ..color = paint.color.withOpacity(0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      canvas.drawRRect(rect, glowPaint);
+    }
   }
 
   bool shouldRepaint(EqualizerPainter oldDelegate) {

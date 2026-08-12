@@ -1,5 +1,5 @@
-import 'package:my_musics/app/network/api/api_urls.dart';
-import 'package:my_musics/app/network/api/dio_client.dart';
+import 'package:my_musics/app/utils/network/api/api_urls.dart';
+import 'package:my_musics/app/utils/network/api/dio_client.dart';
 import 'package:my_musics/src/modules/homescreen/model/track_model.dart';
 import 'package:my_musics/src/modules/homescreen/model/artist_model.dart';
 
