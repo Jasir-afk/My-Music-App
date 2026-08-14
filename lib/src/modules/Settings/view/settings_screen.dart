@@ -138,7 +138,7 @@ class SettingsScreen extends StatelessWidget {
                     const CircleAvatar(
                       radius: 28,
                       backgroundImage: NetworkImage(
-                        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60",
+                        "https://media.gettyimages.com/id/1282552356/photo/concept-of-taking-opportunities-in-life-and-walking-through-the-open-doors.jpg?s=612x612&w=0&k=20&c=aROshvLEhHSJDa4H_yJsDWZTibt1BvySgYj7hfelQhE=",
                       ),
                     ),
                     const SizedBox(width: 16),
