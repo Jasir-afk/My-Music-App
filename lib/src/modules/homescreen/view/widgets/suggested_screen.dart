@@ -269,11 +269,10 @@ class _SuggestedScreenState extends State<SuggestedScreen> {
                 if (controller.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                // Sort by play count descending for "Most Popular"
-                final popularSongs = [...controller.trendingSongs]
-                  ..sort(
-                    (a, b) => (b.playCount ?? 0).compareTo(a.playCount ?? 0),
-                  );
+                // Apply filter and sort to the songs
+                final popularSongs = controller.getFilteredSortedSongs(
+                  controller.trendingSongs,
+                );
                 return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: popularSongs.length,
@@ -303,9 +302,14 @@ class _SuggestedScreenState extends State<SuggestedScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                // Extract unique artists from trending songs
+                // Apply filter and sort to the songs before extracting artists
+                final filteredSongs = controller.getFilteredSortedSongs(
+                  controller.trendingSongs,
+                );
+
+                // Extract unique artists from filtered songs
                 final Map<String, Map<String, dynamic>> artistMap = {};
-                for (final song in controller.trendingSongs) {
+                for (final song in filteredSongs) {
                   final artistName = song.artist ?? 'Unknown';
                   if (!artistMap.containsKey(artistName)) {
                     artistMap[artistName] = {

@@ -43,12 +43,15 @@ class LoginController extends GetxController {
                 Clipboard.setData(
                   ClipboardData(text: authController.currentOTP),
                 );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("OTP copied!"),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
+                // Check if context is still valid before showing snackbar
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("OTP copied!"),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -65,9 +68,11 @@ class LoginController extends GetxController {
       },
       onError: (error) {
         isLoading.value = false;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error)));
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error)));
+        }
       },
     );
   }

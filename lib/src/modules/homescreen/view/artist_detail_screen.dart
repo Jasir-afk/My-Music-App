@@ -275,7 +275,6 @@ class ArtistDetailScreen extends StatelessWidget {
                       }, childCount: controller.songs.length),
                     ),
             ),
-
             Obx(
               () => controller.isLoadingMore.value
                   ? SliverToBoxAdapter(
@@ -364,12 +363,10 @@ class ArtistDetailScreen extends StatelessWidget {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                : null,
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
                           ),
                         ),
                       ),

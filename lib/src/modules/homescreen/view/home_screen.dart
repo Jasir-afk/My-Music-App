@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                   child: const CircleAvatar(
                     radius: 20,
                     backgroundImage: NetworkImage(
-                      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=60",
+                      "https://media.gettyimages.com/id/1282552356/photo/concept-of-taking-opportunities-in-life-and-walking-through-the-open-doors.jpg?s=612x612&w=0&k=20&c=aROshvLEhHSJDa4H_yJsDWZTibt1BvySgYj7hfelQhE=",
                     ),
                   ),
                 ),
@@ -169,7 +169,13 @@ class HomeScreen extends StatelessWidget {
       if (homeController.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
-      if (homeController.trendingSongs.isEmpty) {
+
+      // Apply filter and sort to the songs
+      final filteredSongs = homeController.getFilteredSortedSongs(
+        homeController.trendingSongs,
+      );
+
+      if (filteredSongs.isEmpty) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -195,11 +201,11 @@ class HomeScreen extends StatelessWidget {
 
       // Split the list for reference design sections
       // Show first 5 as "Upcoming", rest as "Recently Play"
-      final upcomingSongs = homeController.trendingSongs.length > 5
-          ? homeController.trendingSongs.take(5).toList()
-          : homeController.trendingSongs.toList();
-      final recentlyPlaySongs = homeController.trendingSongs.length > 5
-          ? homeController.trendingSongs.skip(5).toList()
+      final upcomingSongs = filteredSongs.length > 5
+          ? filteredSongs.take(5).toList()
+          : filteredSongs.toList();
+      final recentlyPlaySongs = filteredSongs.length > 5
+          ? filteredSongs.skip(5).toList()
           : <TrackModel>[];
 
       return RefreshIndicator(
@@ -494,16 +500,18 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Obx(() => Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildSortChip("Most Popular", "popular"),
-                    _buildSortChip("Most Favorited", "favorited"),
-                    _buildSortChip("Newest", "newest"),
-                    _buildSortChip("A-Z", "az"),
-                  ],
-                )),
+            Obx(
+              () => Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildSortChip("Most Popular", "popular"),
+                  _buildSortChip("Most Favorited", "favorited"),
+                  _buildSortChip("Newest", "newest"),
+                  _buildSortChip("A-Z", "az"),
+                ],
+              ),
+            ),
             const SizedBox(height: 16),
             Obx(() {
               if (homeController.availableGenres.isEmpty) {
@@ -546,6 +554,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         homeController.setSortBy(value);
+        Get.back(); // Close the bottom sheet to show results
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -574,6 +583,7 @@ class HomeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         homeController.setFilterGenre(value);
+        Get.back(); // Close the bottom sheet to show results
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

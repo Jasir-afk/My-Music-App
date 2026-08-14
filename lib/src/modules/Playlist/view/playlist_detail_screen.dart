@@ -65,7 +65,7 @@ class PlaylistDetailScreen extends StatelessWidget {
                       onPressed: () =>
                           _confirmDeletePlaylist(context, playlist.name),
                       icon: const Icon(
-                        Icons.delete_outline_rounded,
+                        Icons.delete_rounded,
                         color: AppColors.primary,
                         size: 22,
                       ),
@@ -259,26 +259,95 @@ class PlaylistDetailScreen extends StatelessWidget {
   }
 
   void _confirmDeletePlaylist(BuildContext context, String name) {
-    Get.defaultDialog(
-      title: "Delete Playlist",
-      titleStyle: const TextStyle(color: AppColors.white),
-      middleText: 'Are you sure you want to delete "$name"?',
-      middleTextStyle: const TextStyle(color: AppColors.textSecondary),
-      backgroundColor: AppColors.card,
-      textConfirm: "Yes, Delete",
-      textCancel: "Cancel",
-      confirmTextColor: AppColors.white,
-      cancelTextColor: AppColors.primary,
-      buttonColor: AppColors.primary,
-      onConfirm: () {
-        playlistController.deletePlaylist(playlistId);
-        // Use Navigator.pop() to dismiss the dialog to avoid the GetX
-        // snackbar assertion crash ('!_transitionCompleter.isCompleted')
-        // that occurs when Get.back() tries to close an already-disposed snackbar.
-        Get.closeAllSnackbars();
-        Navigator.of(context, rootNavigator: true).pop(); // Dismiss dialog
-        Navigator.of(context).pop(); // Go back to Playlist Screen
-      },
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                "Delete Playlist",
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Are you sure you want to delete "$name"?',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        playlistController.deletePlaylist(playlistId);
+                        Get.closeAllSnackbars();
+                        Navigator.of(context).pop(); // Dismiss dialog
+                        Navigator.of(
+                          context,
+                        ).pop(); // Go back to Playlist Screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        "Yes, Delete",
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

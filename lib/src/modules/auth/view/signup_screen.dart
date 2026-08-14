@@ -74,7 +74,7 @@ class SignUpScreen extends StatelessWidget {
               color: AppColors.white,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.maybePop(context),
           ),
         ),
       ),
